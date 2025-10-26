@@ -151,7 +151,7 @@ class ImageNetTrain(ImageNetBase):
         if self.data_root:
             self.root = os.path.join(self.data_root, self.NAME)
         else:
-            cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
+            cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("/storage/hjchoi/"))
             self.root = os.path.join(cachedir, "autoencoders/data", self.NAME)
 
         self.datadir = os.path.join(self.root, "data")
@@ -177,7 +177,7 @@ class ImageNetTrain(ImageNetBase):
                     tar.extractall(path=datadir)
 
                 print("Extracting sub-tars.")
-                subpaths = sorted(glob.glob(os.path.join(datadir, "*.tar")))
+                subpaths = sorted(glob.glob(os.path.join(datadir, "*.tar"))) # 1000
                 for subpath in tqdm(subpaths):
                     subdir = subpath[:-len(".tar")]
                     os.makedirs(subdir, exist_ok=True)
@@ -217,7 +217,7 @@ class ImageNetValidation(ImageNetBase):
         if self.data_root:
             self.root = os.path.join(self.data_root, self.NAME)
         else:
-            cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
+            cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("/storage/hjchoi/"))
             self.root = os.path.join(cachedir, "autoencoders/data", self.NAME)
         self.datadir = os.path.join(self.root, "data")
         self.txt_filelist = os.path.join(self.root, "filelist.txt")
@@ -233,7 +233,8 @@ class ImageNetValidation(ImageNetBase):
                 path = os.path.join(self.root, self.FILES[0])
                 if not os.path.exists(path) or not os.path.getsize(path)==self.SIZES[0]:
                     import academictorrents as at
-                    atpath = at.get(self.AT_HASH, datastore=self.root)
+                    atpath = at.get(self.AT_HASH, datastore=self.root,
+                                    urls=[self.VS_URL],showlogs=True,use_timestamp=False) # Download
                     assert atpath == path
 
                 print("Extracting {} to {}".format(path, datadir))
@@ -391,4 +392,4 @@ class ImageNetSRValidation(ImageNetSR):
         with open("data/imagenet_val_hr_indices.p", "rb") as f:
             indices = pickle.load(f)
         dset = ImageNetValidation(process_images=False,)
-        return Subset(dset, indices)
+        return Subset(dset)

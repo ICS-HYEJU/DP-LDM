@@ -61,7 +61,7 @@ def get_parser(**parser_kwargs):
         "--train",
         type=str2bool,
         const=True,
-        default=False,
+        default=True,
         nargs="?",
         help="train",
     )
@@ -84,7 +84,7 @@ def get_parser(**parser_kwargs):
         type=str2bool,
         nargs="?",
         const=True,
-        default=False,
+        default=True,
         help="enable post-mortem debugging",
     )
     parser.add_argument(
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
     now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
-    # add cwd for convenience and to make classes in this file available when
+    # add cwd(current working directory) for convenience and to make classes in this file available when
     # running as `python main.py`
     # (in particular `main.DataModuleFromConfig`)
     sys.path.append(os.getcwd())
@@ -208,7 +208,7 @@ if __name__ == "__main__":
         if opt.name:
             name = "_" + opt.name
         elif opt.base:
-            cfg_fname = os.path.split(opt.base[0])[-1]
+            cfg_fname = os.path.split(opt.base[0])[-1] # 'autoencoder_kl_16x16x16.yaml'
             cfg_name = os.path.splitext(cfg_fname)[0]
             name = "_" + cfg_name
         else:
@@ -222,16 +222,18 @@ if __name__ == "__main__":
 
     try:
         # init and save configs
-        configs = [OmegaConf.load(cfg) for cfg in opt.base]
-        cli = OmegaConf.from_dotlist(unknown)
+        configs = [OmegaConf.load(cfg) for cfg in opt.base] #OmegaConf: can read/edit configurations in YAML file
+        cli = OmegaConf.from_dotlist(unknown) # make empty dict,{} / from_dotlist: dot list
         config = OmegaConf.merge(*configs, cli)
         lightning_config = config.pop("lightning", OmegaConf.create())
         # merge trainer cli with config
         trainer_config = lightning_config.get("trainer", OmegaConf.create())
         # default to ddp
-        trainer_config["accelerator"] = trainer_config.get("accelerator", "ddp")
+        trainer_config.setdefault("accelerator", "gpu")
+        trainer_config.setdefault("strategy", "ddp")
+        # trainer_config["accelerator"] = trainer_config.get("accelerator", "ddp")
         for k in nondefault_trainer_args(opt):
-            trainer_config[k] = getattr(opt, k)
+            trainer_config[k] = getattr(opt, k) # getatter: string -> attirbutes
         if "gpus" not in trainer_config:
             del trainer_config["accelerator"]
             cpu = True

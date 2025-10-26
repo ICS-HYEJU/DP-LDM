@@ -7,7 +7,7 @@ from torchvision import datasets
 class MNISTBase(datasets.MNIST):
     def __init__(self, datadir, size=None, **kwargs):
         self.size = size
-        cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
+        cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("/storage/hjchoi"))
         super().__init__(root=os.path.join(cachedir, datadir), **kwargs)
 
     def __getitem__(self, index):

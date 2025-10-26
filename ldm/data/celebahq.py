@@ -20,7 +20,7 @@ class CelebAHQ(Dataset):
                  size=256,
                  class_attrs=None,
                  **kwargs):
-        cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
+        cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("/storage/hjchoi/"))
         self.root = os.path.join(cachedir, datadir)
         self.split = split
         self.target_type = target_type

@@ -5,7 +5,7 @@ from torchvision.transforms import Resize, CenterCrop, ToTensor, Compose
 
 class CelebABase(CelebA):
     def __init__(self, datadir, config, **kwargs):
-        cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
+        cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("/storage/hjchoi/"))
         super().__init__(
             root=os.path.join(cachedir, datadir),
             target_type=[],
